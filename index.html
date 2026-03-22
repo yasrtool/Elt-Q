@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Quiz — Classroom Management & Exploration of Teaching</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c14;
+    --surface: #0f1623;
+    --surface2: #161f30;
+    --accent: #4f8ef7;
+    --accent2: #00d4ff;
+    --gold: #f5a623;
+    --success: #22c55e;
+    --danger: #f43f5e;
+    --text: #eef2ff;
+    --muted: #8b9ab3;
+    --border: #1c2840;
+    --card: #111827;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at 15% 15%, rgba(79,142,247,0.06) 0%, transparent 55%), radial-gradient(ellipse at 85% 85%, rgba(0,212,255,0.04) 0%, transparent 55%); pointer-events: none; z-index: 0; }
+  .page { position: relative; z-index: 1; }
+
+  /* REDIRECT */
+  #redirect-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; text-align: center; }
+  .redirect-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 3.5rem 2.5rem; max-width: 480px; width: 100%; box-shadow: 0 30px 70px rgba(0,0,0,0.6); animation: fadeUp 0.6s ease; }
+  .tg-icon { width: 88px; height: 88px; background: linear-gradient(135deg, #229ed9, #1565c0); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.8rem; font-size: 2.8rem; box-shadow: 0 10px 35px rgba(34,158,217,0.45); }
+  .redirect-card h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.7rem; font-weight: 700; margin-bottom: 0.9rem; }
+  .redirect-card p { color: var(--muted); font-size: 0.97rem; line-height: 1.75; margin-bottom: 2.2rem; }
+  .btn-tg { display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; background: linear-gradient(135deg, #229ed9, #1565c0); color: white; text-decoration: none; padding: 1rem 2rem; border-radius: 14px; font-size: 1rem; font-weight: 600; font-family: 'Inter', sans-serif; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 22px rgba(34,158,217,0.4); cursor: pointer; border: none; width: 100%; margin-bottom: 1rem; }
+  .btn-tg:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(34,158,217,0.55); }
+  .btn-continue { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: transparent; color: var(--muted); border: 1.5px solid var(--border); padding: 0.9rem 2rem; border-radius: 14px; font-size: 0.95rem; font-family: 'Inter', sans-serif; cursor: pointer; width: 100%; transition: all 0.2s; }
+  .btn-continue:hover { border-color: var(--accent); color: var(--accent); }
+  .countdown { margin-top: 1.8rem; font-size: 0.85rem; color: var(--muted); }
+  .countdown span { color: var(--gold); font-weight: 700; font-size: 1.15rem; }
+
+  /* LOGIN */
+  #login-page { display: none; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+  .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 3rem 2.5rem; max-width: 500px; width: 100%; box-shadow: 0 30px 70px rgba(0,0,0,0.6); animation: fadeUp 0.6s ease; }
+  .logo-area { text-align: center; margin-bottom: 2.2rem; }
+  .logo-icon { width: 72px; height: 72px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 1rem; box-shadow: 0 8px 32px rgba(79,142,247,0.4); }
+  .logo-area h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.3rem; }
+  .logo-area p { color: var(--muted); font-size: 0.88rem; }
+  .form-group { margin-bottom: 1.6rem; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.55rem; font-weight: 500; letter-spacing: 0.02em; text-transform: uppercase; }
+  .form-group input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 0.9rem 1.2rem; color: var(--text); font-size: 1rem; font-family: 'Inter', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+  .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,142,247,0.15); }
+  .form-group input::placeholder { color: #3a4a60; }
+  .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.45rem; }
+  .btn-primary { width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 13px; padding: 1rem; color: white; font-size: 1rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 22px rgba(79,142,247,0.4); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(79,142,247,0.55); }
+  .error-msg { background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3); border-radius: 10px; padding: 0.8rem 1rem; color: #fda4af; font-size: 0.88rem; margin-top: 1rem; display: none; }
+
+  /* QUIZ */
+  #quiz-page { display: none; padding: 1.5rem 1rem 5rem; max-width: 880px; margin: 0 auto; }
+  .quiz-header { background: rgba(15,22,35,0.92); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 18px; padding: 1.2rem 1.6rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; position: sticky; top: 1rem; z-index: 20; }
+  .student-badge { display: flex; align-items: center; gap: 0.6rem; background: var(--surface2); padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.9rem; font-weight: 500; }
+  .student-badge span { color: var(--accent2); font-weight: 700; }
+  .quiz-progress { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .progress-bar-wrap { width: 180px; height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.35s ease; width: 0%; }
+  .progress-text { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+  .quiz-title-area { text-align: center; margin-bottom: 2.5rem; }
+  .quiz-title-area h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.45rem; }
+  .quiz-title-area p { color: var(--muted); font-size: 0.9rem; }
+  .question-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem 2rem; margin-bottom: 1.2rem; transition: border-color 0.2s; animation: fadeUp 0.3s ease both; }
+  .question-card:hover { border-color: #253551; }
+  .q-section-tag { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--surface2); border: 1px solid var(--border); padding: 0.28rem 0.75rem; border-radius: 20px; font-size: 0.73rem; color: var(--gold); font-weight: 600; margin-bottom: 0.9rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .q-num { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; width: 30px; height: 30px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.85rem; }
+  .q-text { font-size: 1.02rem; font-weight: 500; color: var(--text); line-height: 1.72; margin-bottom: 1.3rem; font-family: 'Space Grotesk', sans-serif; }
+  .options-grid { display: grid; gap: 0.65rem; }
+  .option-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 0.85rem 1.1rem; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.93rem; cursor: pointer; text-align: left; transition: all 0.18s; display: flex; align-items: flex-start; gap: 0.75rem; width: 100%; line-height: 1.55; }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(79,142,247,0.07); transform: translateX(3px); }
+  .option-btn.selected { border-color: var(--accent); background: rgba(79,142,247,0.12); color: #93c5fd; }
+  .option-btn.correct { border-color: var(--success); background: rgba(34,197,94,0.1); color: #86efac; }
+  .option-btn.wrong { border-color: var(--danger); background: rgba(244,63,94,0.09); color: #fda4af; }
+  .opt-label { min-width: 26px; height: 26px; border-radius: 6px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; flex-shrink: 0; margin-top: 1px; }
+  .option-btn.selected .opt-label { background: var(--accent); color: white; }
+  .option-btn.correct .opt-label { background: var(--success); color: white; }
+  .option-btn.wrong .opt-label { background: var(--danger); color: white; }
+  .submit-area { text-align: center; padding: 2.5rem 0 1rem; }
+  .btn-submit { background: linear-gradient(135deg, var(--gold), #d97706); border: none; border-radius: 15px; padding: 1.1rem 3.5rem; color: white; font-size: 1.05rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 22px rgba(245,166,35,0.4); }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,166,35,0.55); }
+  .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* RESULTS */
+  #results-page { display: none; padding: 2rem 1rem 5rem; max-width: 880px; margin: 0 auto; }
+  .result-hero { background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; position: relative; overflow: hidden; animation: fadeUp 0.5s ease; }
+  .result-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold)); }
+  .score-ring { width: 150px; height: 150px; border-radius: 50%; background: var(--surface2); border: 5px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 1.8rem; box-shadow: 0 0 50px rgba(79,142,247,0.28); }
+  .score-pct { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .score-sublabel { font-size: 0.72rem; color: var(--muted); margin-top: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .result-hero h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.65rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .grade-pill { display: inline-block; padding: 0.45rem 1.4rem; border-radius: 30px; font-size: 0.95rem; font-weight: 700; margin-top: 0.5rem; font-family: 'Space Grotesk', sans-serif; }
+  .grade-a { background: rgba(34,197,94,0.12); color: #86efac; border: 1px solid #22c55e; }
+  .grade-b { background: rgba(79,142,247,0.12); color: #93c5fd; border: 1px solid #4f8ef7; }
+  .grade-c { background: rgba(245,166,35,0.12); color: #fcd34d; border: 1px solid #f5a623; }
+  .grade-d { background: rgba(244,63,94,0.12); color: #fda4af; border: 1px solid #f43f5e; }
+  .result-stats { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-top: 1.8rem; }
+  .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 1.1rem 1.6rem; min-width: 115px; text-align: center; }
+  .stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 800; display: block; line-height: 1; margin-bottom: 0.35rem; }
+  .stat-num.green { color: var(--success); }
+  .stat-num.red   { color: var(--danger); }
+  .stat-num.blue  { color: var(--accent); }
+  .stat-desc { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+  .wrong-section { animation: fadeUp 0.5s ease 0.2s both; }
+  .wrong-section h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--danger); margin-bottom: 1.3rem; display: flex; align-items: center; gap: 0.5rem; }
+  .wrong-card { background: var(--card); border: 1px solid rgba(244,63,94,0.22); border-left: 4px solid var(--danger); border-radius: 16px; padding: 1.5rem 1.6rem; margin-bottom: 1rem; }
+  .wrong-num { font-size: 0.72rem; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.55rem; }
+  .wrong-q-text { font-size: 0.97rem; font-weight: 500; line-height: 1.65; margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif; }
+  .ans-row { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.5rem; font-size: 0.88rem; line-height: 1.5; }
+  .ans-tag { padding: 0.22rem 0.7rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tag-wrong   { background: rgba(244,63,94,0.15); color: #fda4af; }
+  .tag-correct { background: rgba(34,197,94,0.15); color: #86efac; }
+  .tg-status-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.4rem; text-align: center; font-size: 0.9rem; color: var(--muted); margin-top: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.25); border-top-color: white; border-radius: 50%; animation: spin 0.75s linear infinite; vertical-align: middle; margin-left: 6px; }
+
+  @media (max-width: 600px) {
+    .quiz-header { flex-direction: column; position: relative; top: 0; }
+    .progress-bar-wrap { width: 140px; }
+    .result-stats { gap: 0.9rem; }
+    .login-card, .redirect-card { padding: 2rem 1.4rem; }
+    .question-card { padding: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- REDIRECT PAGE -->
+<div id="redirect-page" class="page">
+  <div class="redirect-card">
+    <div class="tg-icon">✈️</div>
+    <h1>Join the Course Channel</h1>
+    <p>Before starting the quiz, you must join the official Telegram channel to receive the latest updates, study materials, and announcements.</p>
+    <a href="https://t.me/vgsscwe" target="_blank" class="btn-tg" onclick="markVisited()">📢 &nbsp; Join Channel on Telegram</a>
+    <button class="btn-continue" onclick="showLogin()">Already joined — Continue to Quiz →</button>
+    <div class="countdown">Auto-redirecting in <span id="cd">15</span> seconds</div>
+  </div>
+</div>
+
+<!-- LOGIN PAGE -->
+<div id="login-page" class="page" style="display:none; min-height:100vh; align-items:center; justify-content:center;">
+  <div class="login-card">
+    <div class="logo-area">
+      <div class="logo-icon">🎓</div>
+      <h1>Academic Quiz</h1>
+      <p>Classroom Management &amp; Exploration of Teaching</p>
+    </div>
+    <div class="form-group">
+      <label>Full Name (Four Parts)</label>
+      <input type="text" id="student-name" placeholder="e.g. Ahmed Mohammed Ali Hussein" autocomplete="off">
+      <div class="hint">⚠️ Enter your full four-part name (minimum 4 words)</div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Start Quiz →</button>
+    <div class="error-msg" id="login-error">Please enter your full four-part name (at least 4 words).</div>
+  </div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div id="quiz-page" class="page">
+  <div class="quiz-header">
+    <div class="student-badge">👤 &nbsp;<span id="display-name">—</span></div>
+    <div class="quiz-progress">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
+      <div class="progress-text" id="progress-text">0 / 0</div>
+    </div>
+  </div>
+  <div class="quiz-title-area">
+    <h2>📚 Comprehensive Quiz — Classroom Management &amp; Exploration of Teaching</h2>
+    <p>Select the best answer for each question</p>
+  </div>
+  <div id="questions-container"></div>
+  <div class="submit-area">
+    <button class="btn-submit" id="submit-btn" onclick="submitQuiz()" disabled>Submit Answers &amp; Get Results 🚀</button>
+    <p id="submit-hint" style="color:var(--muted);font-size:0.85rem;margin-top:0.9rem;">Answer all questions to enable the submit button</p>
+  </div>
+</div>
+
+<!-- RESULTS PAGE -->
+<div id="results-page" class="page">
+  <div class="result-hero">
+    <div class="score-ring">
+      <div class="score-pct" id="res-pct">0%</div>
+      <div class="score-sublabel">Score</div>
+    </div>
+    <h2 id="res-title">—</h2>
+    <div id="res-grade" class="grade-pill grade-b">—</div>
+    <div class="result-stats">
+      <div class="stat-box"><span class="stat-num green" id="res-correct">0</span><div class="stat-desc">Correct ✅</div></div>
+      <div class="stat-box"><span class="stat-num red"   id="res-wrong">0</span><div class="stat-desc">Incorrect ❌</div></div>
+      <div class="stat-box"><span class="stat-num blue"  id="res-total">0</span><div class="stat-desc">Total Questions 📋</div></div>
+    </div>
+    <div class="tg-status-box" id="tg-status"><span class="spinner"></span> Sending result to supervisor…</div>
+  </div>
+  <div class="wrong-section" id="wrong-section"></div>
+</div>
+
+<script>
+const questions = [
+  // ── SECTION A: CLASSROOM MANAGEMENT ──
+  { section:"📘 Classroom Management", text:"Which of the following best defines classroom management?", options:["Controlling student behavior and punishing misbehavior","Organizing what happens in the classroom so that learning can take place","Raising students' voices to motivate participation","Preparing detailed lesson plans for every class session"], correct:1 },
+  { section:"📘 Classroom Management", text:"According to the lecture, who is the most powerful person in the classroom?", options:["The school principal","The highest-achieving student","The teacher","The educational supervisor"], correct:2 },
+  { section:"📘 Classroom Management", text:"Which THREE elements does the teacher influence inside the classroom?", options:["Type of interaction only","Classroom atmosphere and learning opportunities only","Type of interaction, classroom atmosphere, and learning opportunities","The curriculum and assessment methods only"], correct:2 },
+  { section:"📘 Classroom Management", text:"What is the primary goal of classroom management in EFL/ESL teaching?", options:["To maintain strict discipline and prevent disorder","To create an atmosphere that encourages English interaction and meaningful communication","To cover as much of the syllabus as possible","To reduce testing time and increase activities"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Talk", text:"What is the most important characteristic of effective teacher talk?", options:["It should be long and comprehensive","It should be purposeful, selective, and meaningful","It should always be delivered in the students' native language","It should be loud and clear at all times"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Talk", text:"Which of the following is a productive use of teacher talk?", options:["Delivering long lectures to explain every concept","Answering students' questions and giving clear instructions","Always using the mother tongue for explanation","Speaking very rapidly to cover more material"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Talk", text:"What is the likely effect of long speeches by the teacher on students?", options:["They increase students' motivation and concentration","They encourage students to ask more questions","They may cause confusion and make students passive","They significantly improve students' listening skills"], correct:2 },
+  { section:"📘 Classroom Management — Teacher Talk", text:"Which of the following is NOT listed as a productive use of English by the teacher?", options:["Explaining homework assignments","Telling short comprehensible stories","Translating the entire lesson into the students' mother tongue","Conducting listening activities such as dictation"], correct:2 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What are Display Questions?", options:["Questions whose answers the teacher does not know","Questions whose answers the teacher already knows, used to check knowledge or practice language","Questions used to verify information provided by students","Questions about students' personal lives and experiences"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"Which of the following is an example of a Display Question?", options:["What is your favorite color?","Who among you has visited a museum?","What is the past tense of the verb 'do'?","How does your family celebrate national holidays?"], correct:2 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What is the main purpose of Display Questions?", options:["To stimulate genuine communication between students","To practice, drill, and reinforce the target language","To develop students' critical thinking skills","To check students' understanding of given instructions"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What are Referential Questions?", options:["Questions whose answers the teacher already knows before asking","Questions the teacher does NOT know the answer to; they ask for real information","Questions used to confirm the accuracy of information","Questions about grammar rules and morphology"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"Which of the following is an example of a Referential Question?", options:["What is the future tense of the verb 'go'?","What is your favorite color?","How many countries are there in the world?","Did you complete your homework last night?"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What is the purpose of Referential Questions in the classroom?", options:["To practice grammatical structures","To stimulate real communication and show genuine interest in students","To train students in focused listening","To ensure complete curriculum coverage"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What is the purpose of a Comprehension Check question?", options:["To determine whether students have understood the content","To verify the accuracy of student-provided information","To ask students for additional explanatory details","To elicit a simple yes or no answer from students"], correct:0 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What is a BETTER strategy than asking 'Do you understand?'", options:["Repeating the explanation a second time","Asking students to paraphrase what was just said","Giving an immediate short quiz","Moving on to the next topic quickly"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What is the purpose of Confirmation Questions?", options:["To ask for clarification of meaning","To verify information shared by students","To stimulate higher-order critical thinking","To cover required academic topics"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"Which of the following is an example of a Clarification Question?", options:["Did you finish your assignment?","What is the past tense of 'eat'?","Did you say 6:00 or 7:00?","What is your favorite color?"], correct:2 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What are the THREE types of question content mentioned in the lecture?", options:["Review, application, and analysis","Study, procedure, and life","Cognitive, affective, and psychomotor","Open, closed, and mixed questions"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"Which of the following is classified as a Study Question?", options:["Did you do your homework?","How do you celebrate your birthday?","What does the word 'acculturation' mean?","What is your favorite food?"], correct:2 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"What is the main purpose of Study Questions?", options:["To connect learning to real-life experiences","To use language as a vehicle to learn academic content","To check whether homework was completed","To promote meaningful student-to-student interaction"], correct:1 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"Which of the following best describes a Life-Personal Question?", options:["A question about a grammar rule","A question asking for procedural details","A question requesting information from the student's own personal life","A question about general cultural situations"], correct:2 },
+  { section:"📘 Classroom Management — Teacher Questions", text:"Which of the following is an example of a Life-General Question?", options:["What is the present perfect form of 'write'?","Did you do your homework?","How do Iraqis celebrate birthdays?","What is the past tense of 'go'?"], correct:2 },
+  { section:"📘 Classroom Management — Wait Time", text:"What happens when a teacher waits longer after asking a question?", options:["Students feel pressured and become anxious","Students give longer responses and ask more questions","Students lose focus and become distracted","There is no noticeable difference"], correct:1 },
+  { section:"📘 Classroom Management — Wait Time", text:"Which of the following is a documented benefit of increased wait time?", options:["Correct responses decrease","Students become more passive","Students make more inferences","Students stop interacting"], correct:2 },
+  { section:"📘 Classroom Management — Wait Time", text:"When teachers wait longer after a question, students are more likely to:", options:["Give shorter one-word answers","React to each other's responses","Remain silent and confused","Ask the teacher to repeat the question"], correct:1 },
+  { section:"📘 Classroom Management — Grouping", text:"Why should teachers use varied seating and grouping strategies?", options:["To reduce classroom noise","To improve interaction among students","To make grading easier for the teacher","To speed up curriculum coverage"], correct:1 },
+  { section:"📘 Classroom Management — Grouping", text:"Grouping students by fluency, accuracy, or overseas experience is grouping by:", options:["Personality","Ability and experience","Lottery","Self-selection"], correct:1 },
+  { section:"📘 Classroom Management — Grouping", text:"Which is an example of grouping By Lottery?", options:["Grouping shy with outgoing students","Grouping students sitting on the same side of the room","Distributing candies of the same color to form groups","Allowing students to choose their own partners"], correct:2 },
+  { section:"📘 Classroom Management — Grouping", text:"Which of the following represents Self-Selected Groups?", options:["Grouping students by numbers","Distributing colored dots randomly","Allowing students to form their own pick-up teams","Grouping students by proficiency level"], correct:2 },
+  { section:"📘 Classroom Management — Grouping", text:"Grouping students by counting off numbers (1, 2, 3…) is grouping by:", options:["Personality","Lottery","Location","Characteristics"], correct:2 },
+  { section:"📘 Classroom Management — Grouping", text:"Grouping students by their favorite color or celebrity is grouping by:", options:["Ability","Location","Characteristics","Lottery"], correct:2 },
+  { section:"📘 Classroom Management — Instructions", text:"Which technique involves passing instructions in a whisper from student to student?", options:["Miming","Dictation","Whisper Chain","Student paraphrasing"], correct:2 },
+  { section:"📘 Classroom Management — Instructions", text:"Which of the following is an effective technique for giving instructions?", options:["Repeating instructions more than five times loudly","Writing on the board AND explaining verbally simultaneously","Relying on written instructions only","Always using the native language for instructions"], correct:1 },
+  { section:"📘 Classroom Management — Instructions", text:"Which instruction technique uses physical movement without words?", options:["Silent reading then explanation","Dictation","Miming","Whisper chain"], correct:2 },
+  { section:"📘 Classroom Management — On Task", text:"What helps keep students focused and on task during activities?", options:["Giving extremely difficult tasks","Providing clear instructions, goals, and time limits","Allowing students to freely choose any activity","Ignoring all off-task behavior"], correct:1 },
+  { section:"📘 Classroom Management — On Task", text:"Assigning roles such as group leader or timekeeper is a strategy for:", options:["Making grading easier","Keeping students on task","Reducing instructions","Encouraging competition"], correct:1 },
+  { section:"📘 Classroom Management — Comprehensible Input", text:"How does a teacher simplify speech to make language comprehensible?", options:["Speaking quickly to expose students to more vocabulary","Using slower speech, clear pronunciation, gestures, and pauses","Relying on immediate translation","Avoiding explanation and using the textbook directly"], correct:1 },
+  { section:"📘 Classroom Management — Comprehensible Input", text:"What does 'Adding Mediums' mean in comprehensible input?", options:["Increasing the number of assigned textbooks","Combining speech, print, pictures, sounds, and gestures","Using social media platforms in class","Allocating more time to written explanation"], correct:1 },
+  { section:"📘 Classroom Management — Comprehensible Input", text:"What are the THREE main strategies for making language comprehensible?", options:["Reading, writing, and speaking","Simplify speech, add mediums, and negotiate meaning","Repetition, drilling, and testing","Explanation, application, and assessment"], correct:1 },
+  { section:"📘 Classroom Management — Comprehensible Input", text:"Which medium is classified as Paralinguistic?", options:["Spoken language","Written text","Pictures and objects","Gestures and eye contact"], correct:3 },
+  { section:"📘 Classroom Management — Comprehensible Input", text:"Which medium is classified as Nonlinguistic Visual?", options:["Spoken language","Written text","Pictures and real objects","Gestures and facial expressions"], correct:2 },
+  { section:"📘 Classroom Management — Comprehensible Input", text:"What is the result of negotiating meaning in the classroom?", options:["The lesson moves faster","Language becomes more comprehensible to students","Students become more dependent on the teacher","Grammar errors decrease immediately"], correct:1 },
+  { section:"📘 Classroom Management — Comprehensible Input", text:"Which combination best illustrates the 'Add Mediums' strategy?", options:["Reading a grammar rule and memorizing it","Restaurant menu + pictures + real objects + acting","Repeating vocabulary five times aloud","Writing sentences on the board only"], correct:1 },
+  { section:"📘 Classroom Management — Problems", text:"Which is listed as a common classroom problem for EFL/ESL teachers?", options:["Insufficient learning materials","Not having enough time and difficulty getting students to use English","Difficulty communicating with administration","Too many activities in the textbook"], correct:1 },
+  { section:"📘 Classroom Management — Problems", text:"What are the recommended solutions for the classroom time management problem?", options:["Cancel group activities to save time","Estimate time per activity, set time limits, and reflect after lessons","Reduce the number of students per group","Rely solely on the textbook"], correct:1 },
+  { section:"📘 Classroom Management — Problems", text:"How can a teacher encourage students to use English in the classroom?", options:["Penalize students who use their native language","Explain the importance of English, negotiate with students, and gain their trust","Prohibit all native language use with no explanation","Award extra points exclusively to English speakers"], correct:1 },
+  { section:"📘 Classroom Management — Conclusion", text:"According to the lecture conclusion, the correct equation for successful teaching is:", options:["Good management = Good behavior = Good results","Good management = Better communication = Better learning","Good management = More coverage = Higher grades","Good management = Discipline = Success"], correct:1 },
+
+  // ── SECTION B: EXPLORATION OF TEACHING ──
+  { section:"📗 Exploration of Teaching", text:"What is the first method of exploring and developing teaching mentioned in the lecture?", options:["Attending professional conferences","Reading journal articles and books about teaching and learning","Creating a teaching portfolio","Conducting action research"], correct:1 },
+  { section:"📗 Exploration of Teaching", text:"How can reading professional books and journals help a language teacher?", options:["It earns formal academic credentials","It develops the teacher's knowledge about EFL/ESL teaching","It leads to a salary increase","It reduces lesson preparation time"], correct:1 },
+  { section:"📗 Exploration of Teaching", text:"What is the benefit of reading Teacher Narratives?", options:["They provide ready-made lesson plans","They offer glimpses into the realities of teaching, especially for new teachers","They award additional academic credits","They train teachers in modern communication tools"], correct:1 },
+  { section:"📗 Exploration of Teaching", text:"What is the purpose of attending Professional Conferences?", options:["To obtain official leave from school","To hear what teachers are doing in their classrooms and to present your own techniques or research","To review the latest textbooks","To write academic papers for publication"], correct:1 },
+  { section:"📗 Exploration of Teaching", text:"What can a teacher present at a professional conference?", options:["Entertainment shows and performances","Their own teaching techniques or action research findings","Their students' test results","Proposed curriculum reforms"], correct:1 },
+  { section:"📗 Exploration of Teaching — Mentoring", text:"What does the lecture state about Mentoring for language teachers?", options:["It is a brand-new approach in the 21st century","It is sometimes considered a new approach but in fact has a long history","It is a method suitable only for new teachers","It is generally ineffective for language teacher development"], correct:1 },
+  { section:"📗 Exploration of Teaching — Portfolio", text:"What is the main purpose of creating a Teaching Portfolio?", options:["To display the teacher's academic degrees","To help teachers make sense of what they have learned and demonstrate their competencies","To obtain school administration approval","To reduce time spent on external evaluations"], correct:1 },
+  { section:"📗 Exploration of Teaching — Portfolio", text:"Which of the following is a primary item included in a teaching portfolio?", options:["Personal photographs of the teacher","Papers written for academic courses","Student absence records","Weekly lesson timetables"], correct:1 },
+  { section:"📗 Exploration of Teaching — Portfolio", text:"Which of the following is listed as an ADDITIONAL document in a teaching portfolio?", options:["Reflective observation reports and a statement of teaching philosophy","Lists of recommended books","End-of-semester exam schedules","Daily attendance records"], correct:0 },
+  { section:"📗 Exploration of Teaching — Portfolio", text:"Which of the following can be included in a teaching portfolio?", options:["Video or audiotapes of teaching sessions","Student test scores","Personal vacation photographs","Daily attendance records"], correct:0 },
+  { section:"📗 Exploration of Teaching", text:"How does learning another language benefit a teacher's professional development?", options:["It earns international certificates","It helps them understand learners' challenges and experience teaching from a learner's perspective","It prevents grammar errors in class","It gives experience using classroom technology"], correct:1 },
+  { section:"📗 Exploration of Teaching", text:"What is Action Research in the context of professional development?", options:["Reading published research in academic journals","Investigating and solving teaching problems while gaining awareness of classroom interaction","Conducting periodic student assessments","Following educational news and current events"], correct:1 },
+  { section:"📗 Exploration of Teaching", text:"Which activity is part of Action Research and Observation?", options:["Attending off-campus seminars only","Subscribing to educational journals","Self-observation and keeping a teacher journal","Attending formal government training courses"], correct:2 },
+  { section:"📗 Exploration of Teaching", text:"Why is talking with colleagues valuable for a teacher's professional development?", options:["It reduces the teacher's workload","It builds awareness of classroom interaction and enables experience-sharing","It provides permission to apply new methods","It avoids criticism from school administration"], correct:1 },
+  { section:"📗 Exploration of Teaching — Portfolio", text:"What is the 'Statement of Teaching and Learning Philosophy' in a teaching portfolio?", options:["A list of courses the teacher has taught","A statement expressing the teacher's beliefs about teaching and learning","An annual evaluation by the educational supervisor","A brief curriculum vitae of the teacher"], correct:1 },
+  { section:"📗 Exploration of Teaching", text:"How does experiencing language learning from a learner's perspective help a teacher?", options:["It earns them international qualifications","It allows them to experience both effective and ineffective teaching methods firsthand","It helps them explain grammar rules more clearly","It gives experience in using classroom technology"], correct:1 }
+];
+
+let studentName = '';
+let userAnswers  = {};
+
+window.onload = function () {
+  if (sessionStorage.getItem('tg_visited')) { showLogin(); }
+  else { document.getElementById('redirect-page').style.display = 'flex'; runCountdown(); }
+};
+
+function runCountdown() {
+  let n = 15;
+  const el = document.getElementById('cd');
+  const t = setInterval(() => {
+    n--; if (el) el.textContent = n;
+    if (n <= 0) { clearInterval(t); window.open('https://t.me/vgsscwe','_blank'); setTimeout(()=>{markVisited();showLogin();},1200); }
+  }, 1000);
+}
+
+function markVisited() { sessionStorage.setItem('tg_visited','1'); }
+
+function showLogin() {
+  markVisited();
+  document.getElementById('redirect-page').style.display = 'none';
+  document.getElementById('login-page').style.display    = 'flex';
+}
+
+function startQuiz() {
+  const raw   = document.getElementById('student-name').value.trim();
+  const parts = raw.split(/\s+/).filter(p=>p.length>0);
+  const err   = document.getElementById('login-error');
+  if (parts.length < 4) { err.style.display='block'; return; }
+  err.style.display = 'none';
+  studentName = raw;
+  document.getElementById('login-page').style.display = 'none';
+  renderQuiz();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && document.getElementById('login-page').style.display!=='none') startQuiz();
+});
+
+function renderQuiz() {
+  document.getElementById('quiz-page').style.display = 'block';
+  document.getElementById('display-name').textContent  = studentName;
+  document.getElementById('progress-text').textContent = `0 / ${questions.length}`;
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  questions.forEach((q,i) => {
+    const opts = q.options.map((o,oi)=>`
+      <button class="option-btn" id="opt-${i}-${oi}" onclick="pick(${i},${oi})">
+        <span class="opt-label">${labels[oi]}</span><span>${o}</span>
+      </button>`).join('');
+    container.innerHTML += `
+      <div class="question-card" style="animation-delay:${i*0.012}s">
+        <div class="q-section-tag">📌 ${q.section}</div>
+        <div class="q-num">${i+1}</div>
+        <div class="q-text">${q.text}</div>
+        <div class="options-grid">${opts}</div>
+      </div>`;
+  });
+}
+
+function pick(qi,oi) {
+  questions[qi].options.forEach((_,idx)=>{
+    const b=document.getElementById(`opt-${qi}-${idx}`); if(b) b.classList.remove('selected');
+  });
+  const btn=document.getElementById(`opt-${qi}-${oi}`); if(btn) btn.classList.add('selected');
+  userAnswers[qi]=oi;
+  const answered=Object.keys(userAnswers).length;
+  document.getElementById('progress-fill').style.width=(answered/questions.length*100)+'%';
+  document.getElementById('progress-text').textContent=`${answered} / ${questions.length}`;
+  if(answered===questions.length){
+    document.getElementById('submit-btn').disabled=false;
+    const sh=document.getElementById('submit-hint');
+    sh.textContent='✅ All questions answered — you can now submit!';
+    sh.style.color='var(--success)';
+  }
+}
+
+function submitQuiz() {
+  const sb=document.getElementById('submit-btn');
+  sb.disabled=true; sb.innerHTML='Calculating… <span class="spinner"></span>';
+  let correct=0; const wrong=[];
+  questions.forEach((q,i)=>{
+    const ua=userAnswers[i];
+    if(ua===q.correct){ correct++; }
+    else { wrong.push({num:i+1,text:q.text,userAns:ua!==undefined?q.options[ua]:'No answer',correctAns:q.options[q.correct]}); }
+  });
+  const total=questions.length, wrongCt=total-correct, pct=Math.round(correct/total*100);
+  showResults(pct,correct,wrongCt,total,wrong);
+  sendTelegram(pct,correct,wrongCt,total,wrong);
+}
+
+function showResults(pct,correct,wrongCt,total,wrongList) {
+  document.getElementById('quiz-page').style.display='none';
+  document.getElementById('results-page').style.display='block';
+  document.getElementById('res-pct').textContent=pct+'%';
+  document.getElementById('res-correct').textContent=correct;
+  document.getElementById('res-wrong').textContent=wrongCt;
+  document.getElementById('res-total').textContent=total;
+  let title,gc,gt;
+  if(pct>=90){title='🏆 Excellent! Outstanding Performance';gc='grade-a';gt='Grade: A — Distinction';}
+  else if(pct>=75){title='👍 Very Good! Keep it up';gc='grade-b';gt='Grade: B — Very Good';}
+  else if(pct>=60){title='📚 Good — Review more carefully';gc='grade-c';gt='Grade: C — Good';}
+  else{title='⚠️ Needs Comprehensive Review';gc='grade-d';gt='Grade: D — Needs Improvement';}
+  document.getElementById('res-title').textContent=title;
+  const gb=document.getElementById('res-grade'); gb.className='grade-pill '+gc; gb.textContent=gt;
+  const ws=document.getElementById('wrong-section');
+  if(wrongList.length===0){
+    ws.innerHTML='<div style="background:rgba(34,197,94,0.08);border:1px solid #22c55e;border-radius:16px;padding:1.8rem;text-align:center;color:#86efac;font-size:1rem;font-family:Space Grotesk,sans-serif;font-weight:600;">🎉 Perfect Score! You answered all questions correctly!</div>';
+  } else {
+    ws.innerHTML=`<h3>❌ Incorrect Answers & Correct Solutions (${wrongList.length} questions)</h3>`;
+    wrongList.forEach(item=>{
+      ws.innerHTML+=`<div class="wrong-card"><div class="wrong-num">QUESTION ${item.num}</div><div class="wrong-q-text">${item.text}</div><div class="ans-row"><span class="ans-tag tag-wrong">❌ Your Answer</span><span style="color:#fda4af">${item.userAns}</span></div><div class="ans-row"><span class="ans-tag tag-correct">✅ Correct</span><span style="color:#86efac">${item.correctAns}</span></div></div>`;
+    });
+  }
+}
+
+async function sendTelegram(pct,correct,wrongCt,total,wrongList) {
+  const TOKEN='8512197538:AAHPQD93DiBpKlYHESRne05_yU9L-ecXBNc';
+  const CHAT_ID='7692968376';
+  let wrongText=wrongList.length===0?'✅ All answers correct!':
+    wrongList.slice(0,10).map(w=>`• Q${w.num}: ${w.text.substring(0,60)}…\n  ❌ Student: ${w.userAns}\n  ✅ Correct: ${w.correctAns}`).join('\n\n')
+    +(wrongList.length>10?`\n\n… and ${wrongList.length-10} more`:'');
+  const msg=`📊 *New Quiz Result*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Student:* ${studentName}\n━━━━━━━━━━━━━━━━━━━━\n📈 *Score:* ${pct}%\n✅ *Correct:* ${correct} / ${total}\n❌ *Wrong:* ${wrongCt} / ${total}\n━━━━━━━━━━━━━━━━━━━━\n📋 *Wrong Answers:*\n${wrongText}\n━━━━━━━━━━━━━━━━━━━━\n🕐 ${new Date().toLocaleString('en-IQ')}`.trim();
+  try {
+    const resp=await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CHAT_ID,text:msg,parse_mode:'Markdown'})});
+    const data=await resp.json();
+    const el=document.getElementById('tg-status');
+    if(data.ok){el.innerHTML='✅ Result sent to supervisor successfully!';el.style.color='var(--success)';}
+    else{el.innerHTML='⚠️ Could not send automatically. Please record your result manually.';el.style.color='var(--gold)';}
+  } catch {
+    const el=document.getElementById('tg-status');
+    el.innerHTML='⚠️ Connection failed. Please check your internet connection.';el.style.color='var(--gold)';
+  }
+}
+</script>
+</body>
+</html>
